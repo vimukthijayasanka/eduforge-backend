@@ -3,6 +3,7 @@ package lk.ijse.dep13.eduforge.dto.request;
 import jakarta.validation.constraints.*;
 import jakarta.validation.groups.Default;
 import lk.ijse.dep13.eduforge.util.LecturerType;
+import lk.ijse.dep13.eduforge.validation.LecturerProfileImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class LecturerReqTO implements Serializable {
     @NotNull(groups = Update.class, message = "Display order can't be empty")
     @PositiveOrZero(groups = Update.class, message = "Invalid display order")
     private Integer displayOrder;
+    @LecturerProfileImage
     private MultipartFile picture;
     @Pattern(regexp = "^http(s)://.+$", message = "Invalid linkedIn URL")
     private String linkedin;
