@@ -2,6 +2,7 @@ package lk.ijse.dep13.eduforge.controller;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class LecturerHttpController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data", produces = "application/json")
-    public void createNewLecturer(@ModelAttribute LecturerReqTO lecturerReqTO){
+    public void createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
         System.out.println(lecturerReqTO);
     }
 
