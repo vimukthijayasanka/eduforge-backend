@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -67,6 +68,18 @@ public class LecturerHttpController {
         }
     }
 
+    @GetMapping(value = "/{lecturer-id}", produces = "application/json")
+    public LecturerResTO getLecturerDetails(@PathVariable("lecturer-id") Integer lecturerId){
+        Lecturer lecturer = entityManager.find(Lecturer.class, lecturerId);
+        if (lecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer not found" );
+        LecturerResTO lecturerResTO = modelMapper.map(lecturer, LecturerResTO.class);
+        if (lecturer.getLinkedin() != null) lecturerResTO.setLinkedin(lecturer.getLinkedin().getUrl());
+        if (lecturer.getPicture() != null) {
+            lecturerResTO.setPicturePath(bucket.get(lecturer.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+        }
+        return lecturerResTO;
+    }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{lecturer-id}", consumes = "multipart/form-data")
     public void updateLecturerDetailsViaMultipart(@PathVariable("lecturer-id") Integer lecturerId){}
@@ -84,9 +97,6 @@ public class LecturerHttpController {
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l", Lecturer.class);
         return getLecturerTOList(query);
     }
-
-    @GetMapping(value = "/{lecturer-id}", produces = "application/json")
-    public void getLecturerDetails(){}
 
     @GetMapping(params = "type=full-time",produces = "application/json")
     public List<LecturerResTO> getFullTimeLecturers(){
