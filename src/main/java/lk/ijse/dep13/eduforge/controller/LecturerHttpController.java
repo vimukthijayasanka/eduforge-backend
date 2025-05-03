@@ -1,7 +1,11 @@
 package lk.ijse.dep13.eduforge.controller;
 
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
 import jakarta.persistence.EntityManager;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
+import lk.ijse.dep13.eduforge.dto.response.LecturerResTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
@@ -10,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/lecturers")
@@ -22,9 +30,12 @@ public class LecturerHttpController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private Bucket bucket;
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data", produces = "application/json")
-    public void createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
+    public LecturerResTO createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
         System.out.println(lecturerReqTO);
         entityManager.getTransaction().begin();
         try{
@@ -32,17 +43,24 @@ public class LecturerHttpController {
             lecturer.setPicture(null); // model mapper create new object if picture is empty, so have to make it null
             lecturer.setLinkedin(null);
             entityManager.persist(lecturer);
+            LecturerResTO lecturerResTO = modelMapper.map(lecturer, LecturerResTO.class);
 
             if (lecturerReqTO.getPicture() != null) {
-                entityManager.persist(new Picture(lecturer, "lectures/" + lecturer.getId()));
+                Picture picture = new Picture(lecturer, "lectures/" + lecturer.getId());
+                entityManager.persist(picture);
+                Blob blobId = bucket.create(picture.getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+                lecturerResTO.setPicturePath(blobId.signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
             }
             if (lecturerReqTO.getLinkedin() != null) {
                 entityManager.persist(new LinkedIn(lecturer, lecturerReqTO.getLinkedin()));
+                lecturerResTO.setLinkedin(lecturerReqTO.getLinkedin());
             }
+
             entityManager.getTransaction().commit();
-        }catch (Throwable t){
+            return lecturerResTO;
+        }catch (IOException t){
             entityManager.getTransaction().rollback();
-            throw t;
+            throw new RuntimeException(t);
         }
     }
 

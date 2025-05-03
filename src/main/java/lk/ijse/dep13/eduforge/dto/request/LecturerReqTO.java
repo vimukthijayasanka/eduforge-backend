@@ -5,7 +5,6 @@ import jakarta.validation.groups.Default;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import lk.ijse.dep13.eduforge.validation.LecturerProfileImage;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
