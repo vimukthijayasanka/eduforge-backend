@@ -96,7 +96,17 @@ public class LecturerHttpController {
     public void getLecturerDetails(){}
 
     @GetMapping(params = "type=full-time",produces = "application/json")
-    public void getFullTimeLecturers(){}
+    public List<LecturerResTO> getFullTimeLecturers(){
+        TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l WHERE l.type = lk.ijse.dep13.eduforge.util.LecturerType.FULL_TIME", Lecturer.class);
+        return query.getResultStream().map(lecturerEntity -> {
+            LecturerResTO lecturerResTO = modelMapper.map(lecturerEntity, LecturerResTO.class);
+            if (lecturerEntity.getLinkedin() != null) lecturerResTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
+            if (lecturerEntity.getPicture() != null) {
+                lecturerResTO.setPicturePath(bucket.get(lecturerEntity.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+            }
+            return lecturerResTO;
+        }).collect(Collectors.toList());
+    }
 
     @GetMapping(params = "type=visiting", produces = "application/json")
     public void getVisitingLecturers(){}
