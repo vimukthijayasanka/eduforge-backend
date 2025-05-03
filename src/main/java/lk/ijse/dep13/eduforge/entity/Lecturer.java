@@ -28,7 +28,7 @@ public class Lecturer implements Serializable {
     @Enumerated(EnumType.STRING)
     private LecturerType type;
     @Column(nullable = false, name = "display_order")
-    private Integer displayOrder;
+    private int displayOrder;
 
     @ToString.Exclude
     @OneToOne(mappedBy = "lecturer")
@@ -38,7 +38,7 @@ public class Lecturer implements Serializable {
     @OneToOne(mappedBy = "lecturer")
     private LinkedIn linkedin;
 
-    public Lecturer(String name, String designation, String qualification, LecturerType type, Integer displayOrder) {
+    public Lecturer(String name, String designation, String qualification, LecturerType type, int displayOrder) {
         this.name = name;
         this.designation = designation;
         this.qualification = qualification;
@@ -46,7 +46,7 @@ public class Lecturer implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    public Lecturer(Integer id, String name, String designation, String qualification, LecturerType type, Integer displayOrder) {
+    public Lecturer(Integer id, String name, String designation, String qualification, LecturerType type, int displayOrder) {
         this.id = id;
         this.name = name;
         this.designation = designation;
