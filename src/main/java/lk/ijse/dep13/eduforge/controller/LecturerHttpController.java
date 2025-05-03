@@ -82,14 +82,7 @@ public class LecturerHttpController {
     @GetMapping(produces = "application/json")
     public List<LecturerResTO> getAllLecturers(){
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l", Lecturer.class);
-        return query.getResultStream().map(lecturerEntity -> {
-            LecturerResTO lecturerResTO = modelMapper.map(lecturerEntity, LecturerResTO.class);
-            if (lecturerEntity.getLinkedin() != null) lecturerResTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
-            if (lecturerEntity.getPicture() != null) {
-                lecturerResTO.setPicturePath(bucket.get(lecturerEntity.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
-            }
-            return lecturerResTO;
-        }).collect(Collectors.toList());
+        return getLecturerTOList(query);
     }
 
     @GetMapping(value = "/{lecturer-id}", produces = "application/json")
@@ -98,6 +91,16 @@ public class LecturerHttpController {
     @GetMapping(params = "type=full-time",produces = "application/json")
     public List<LecturerResTO> getFullTimeLecturers(){
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l WHERE l.type = lk.ijse.dep13.eduforge.util.LecturerType.FULL_TIME", Lecturer.class);
+        return getLecturerTOList(query);
+    }
+
+    @GetMapping(params = "type=visiting", produces = "application/json")
+    public List<LecturerResTO> getVisitingLecturers(){
+        TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l WHERE l.type = lk.ijse.dep13.eduforge.util.LecturerType.VISITING", Lecturer.class);
+        return getLecturerTOList(query);
+    }
+
+    private List<LecturerResTO> getLecturerTOList(TypedQuery<Lecturer> query) {
         return query.getResultStream().map(lecturerEntity -> {
             LecturerResTO lecturerResTO = modelMapper.map(lecturerEntity, LecturerResTO.class);
             if (lecturerEntity.getLinkedin() != null) lecturerResTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
@@ -107,7 +110,4 @@ public class LecturerHttpController {
             return lecturerResTO;
         }).collect(Collectors.toList());
     }
-
-    @GetMapping(params = "type=visiting", produces = "application/json")
-    public void getVisitingLecturers(){}
 }
