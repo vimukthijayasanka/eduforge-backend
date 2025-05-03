@@ -4,6 +4,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerResTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/lecturers")
@@ -77,7 +80,17 @@ public class LecturerHttpController {
     public void deleteLecturer(@PathVariable("lecturer-id") Integer lecturerId){}
 
     @GetMapping(produces = "application/json")
-    public void getAllLecturers(){}
+    public List<LecturerResTO> getAllLecturers(){
+        TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l", Lecturer.class);
+        return query.getResultStream().map(lecturerEntity -> {
+            LecturerResTO lecturerResTO = modelMapper.map(lecturerEntity, LecturerResTO.class);
+            if (lecturerEntity.getLinkedin() != null) lecturerResTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
+            if (lecturerEntity.getPicture() != null) {
+                lecturerResTO.setPicturePath(bucket.get(lecturerEntity.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+            }
+            return lecturerResTO;
+        }).collect(Collectors.toList());
+    }
 
     @GetMapping(value = "/{lecturer-id}", produces = "application/json")
     public void getLecturerDetails(){}
