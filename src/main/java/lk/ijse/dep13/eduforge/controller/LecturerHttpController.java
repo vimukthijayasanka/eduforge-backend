@@ -50,7 +50,7 @@ public class LecturerHttpController {
             LecturerResTO lecturerResTO = modelMapper.map(lecturer, LecturerResTO.class);
 
             if (lecturerReqTO.getPicture() != null) {
-                Picture picture = new Picture(lecturer, "lectures/" + lecturer.getId());
+                Picture picture = new Picture(lecturer, "lecturers/" + lecturer.getId());
                 entityManager.persist(picture);
                 Blob blobId = bucket.create(picture.getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
                 lecturerResTO.setPicturePath(blobId.signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
@@ -82,7 +82,44 @@ public class LecturerHttpController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{lecturer-id}", consumes = "multipart/form-data")
-    public void updateLecturerDetailsViaMultipart(@PathVariable("lecturer-id") Integer lecturerId){}
+    public void updateLecturerDetailsViaMultipart(@PathVariable("lecturer-id") Integer lecturerId
+    , @ModelAttribute @Validated(LecturerReqTO.Update.class) LecturerReqTO lecturerReqTO){
+        System.out.println(lecturerReqTO);
+        Lecturer currentLecturer = entityManager.find(Lecturer.class, lecturerId);
+        if (currentLecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer Not Found");
+        entityManager.getTransaction().begin();
+        try {
+            Lecturer newLecturer = modelMapper.map(lecturerReqTO, Lecturer.class);
+            newLecturer.setId(lecturerId);
+            newLecturer.setLinkedin(null);
+            newLecturer.setPicture(null);
+
+            if (lecturerReqTO.getLinkedin() != null) newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
+            if (lecturerReqTO.getPicture() != null) {
+                newLecturer.setPicture(new Picture(newLecturer, "lecturers/" + lecturerId));
+            }
+
+            // Remove if the user wants to delete LinkedIn from the profile
+            if (newLecturer.getLinkedin() == null && currentLecturer.getLinkedin() != null) {
+                entityManager.remove(currentLecturer.getLinkedin());
+            }
+
+            // Remove if the user wants to delete the profile picture from the profile
+            if (newLecturer.getPicture() == null && currentLecturer.getPicture() != null) {
+                entityManager.remove(currentLecturer.getPicture());
+                bucket.get(currentLecturer.getPicture().getPicturePath()).delete();
+            }
+            if (newLecturer.getPicture() != null) {
+                bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+            }
+
+            entityManager.merge(newLecturer);
+            entityManager.getTransaction().commit();
+        } catch (Throwable e){
+            entityManager.getTransaction().rollback();
+            throw new RuntimeException(e);
+        }
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{lecturer-id}", consumes = "application/json")
