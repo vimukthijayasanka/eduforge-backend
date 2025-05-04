@@ -14,7 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "lecturer")
-public class Lecturer implements Serializable {
+public class Lecturer implements SuperEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer id;
