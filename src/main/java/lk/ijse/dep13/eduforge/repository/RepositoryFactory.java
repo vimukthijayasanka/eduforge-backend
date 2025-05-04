@@ -5,6 +5,7 @@ import lk.ijse.dep13.eduforge.repository.custom.QueryRepository;
 import lk.ijse.dep13.eduforge.repository.custom.impl.LecturerRepositoryImpl;
 import lk.ijse.dep13.eduforge.repository.custom.impl.LinkedInRepositoryImpl;
 import lk.ijse.dep13.eduforge.repository.custom.impl.PictureRepositoryImpl;
+import lk.ijse.dep13.eduforge.repository.custom.impl.QueryRepositoryImpl;
 
 public class RepositoryFactory {
 
