@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 
 @RestController
@@ -84,7 +85,6 @@ public class LecturerHttpController {
     @PatchMapping(value = "/{lecturer-id}", consumes = "multipart/form-data")
     public void updateLecturerDetailsViaMultipart(@PathVariable("lecturer-id") Integer lecturerId
     , @ModelAttribute @Validated(LecturerReqTO.Update.class) LecturerReqTO lecturerReqTO){
-        System.out.println(lecturerReqTO);
         Lecturer currentLecturer = entityManager.find(Lecturer.class, lecturerId);
         if (currentLecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer Not Found");
         entityManager.getTransaction().begin();
@@ -94,22 +94,31 @@ public class LecturerHttpController {
             newLecturer.setLinkedin(null);
             newLecturer.setPicture(null);
 
-            if (lecturerReqTO.getLinkedin() != null) newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
-            if (lecturerReqTO.getPicture() != null) {
+            if (lecturerReqTO.getPicture() != null && !lecturerReqTO.getPicture().isEmpty() ) {
                 newLecturer.setPicture(new Picture(newLecturer, "lecturers/" + lecturerId));
             }
 
-            // Remove if the user wants to delete LinkedIn from the profile
-            if (newLecturer.getLinkedin() == null && currentLecturer.getLinkedin() != null) {
-                entityManager.remove(currentLecturer.getLinkedin());
+            if (lecturerReqTO.getLinkedin() != null) {
+                newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
             }
 
-            // Remove if the user wants to delete the profile picture from the profile
-            if (newLecturer.getPicture() == null && currentLecturer.getPicture() != null) {
+            if (newLecturer.getLinkedin() != null && currentLecturer.getLinkedin() == null) {
+                entityManager.persist(newLecturer.getLinkedin());
+            } else if (newLecturer.getLinkedin() == null && currentLecturer.getLinkedin() != null) {
+                entityManager.remove(currentLecturer.getLinkedin());
+            } else if (newLecturer.getLinkedin() != null){
+                newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
+                entityManager.merge(newLecturer.getLinkedin());
+            }
+
+            if (newLecturer.getPicture() != null && currentLecturer.getPicture() == null) {
+                entityManager.persist(newLecturer.getPicture());
+                bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+            } else if (newLecturer.getPicture() == null && currentLecturer.getPicture() != null) {
                 entityManager.remove(currentLecturer.getPicture());
                 bucket.get(currentLecturer.getPicture().getPicturePath()).delete();
-            }
-            if (newLecturer.getPicture() != null) {
+            } else if (newLecturer.getPicture() != null) {
+                entityManager.merge(newLecturer.getPicture());
                 bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
             }
 
