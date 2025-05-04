@@ -6,6 +6,7 @@ import com.google.cloud.storage.Storage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
+import lk.ijse.dep13.eduforge.dto.request.LecturerUpdateReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerResTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
@@ -102,14 +103,7 @@ public class LecturerHttpController {
                 newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
             }
 
-            if (newLecturer.getLinkedin() != null && currentLecturer.getLinkedin() == null) {
-                entityManager.persist(newLecturer.getLinkedin());
-            } else if (newLecturer.getLinkedin() == null && currentLecturer.getLinkedin() != null) {
-                entityManager.remove(currentLecturer.getLinkedin());
-            } else if (newLecturer.getLinkedin() != null){
-                newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
-                entityManager.merge(newLecturer.getLinkedin());
-            }
+            updateLinkedIn(currentLecturer, newLecturer);
 
             if (newLecturer.getPicture() != null && currentLecturer.getPicture() == null) {
                 entityManager.persist(newLecturer.getPicture());
@@ -132,7 +126,27 @@ public class LecturerHttpController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{lecturer-id}", consumes = "application/json")
-    public void updateLecturerDetailsViaJson(@PathVariable("lecturer-id") Integer lecturerId){}
+    public void updateLecturerDetailsViaJson(@PathVariable("lecturer-id") Integer lecturerId,
+                                             @RequestBody @Validated LecturerUpdateReqTO lecturerUpdateReqTO){
+        Lecturer currentLecturer = entityManager.find(Lecturer.class, lecturerId);
+        if (currentLecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer Not Found");
+        entityManager.getTransaction().begin();
+        try{
+            Lecturer newLecturer = modelMapper.map(lecturerUpdateReqTO, Lecturer.class);
+            newLecturer.setId(lecturerId);
+            newLecturer.setPicture(currentLecturer.getPicture());
+
+            newLecturer.setLinkedin(lecturerUpdateReqTO.getLinkedin() == null ? currentLecturer.getLinkedin() : new LinkedIn(newLecturer,lecturerUpdateReqTO.getLinkedin()));
+
+            updateLinkedIn(currentLecturer, newLecturer);
+
+            entityManager.merge(newLecturer);
+            entityManager.getTransaction().commit();
+        } catch (Throwable t){
+            entityManager.getTransaction().rollback();
+            throw new RuntimeException(t);
+        }
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{lecturer-id}")
@@ -179,5 +193,15 @@ public class LecturerHttpController {
             }
             return lecturerResTO;
         }).collect(Collectors.toList());
+    }
+
+    private void updateLinkedIn(Lecturer currentLecturer, Lecturer newLecturer) {
+        if (currentLecturer.getLinkedin() != null && newLecturer.getLinkedin() == null) {
+            entityManager.remove(currentLecturer.getLinkedin());
+        } else if (currentLecturer.getLinkedin() == null && newLecturer.getLinkedin() != null) {
+            entityManager.persist(newLecturer.getLinkedin());
+        } else if(newLecturer.getLinkedin() != null){
+            entityManager.merge(newLecturer.getLinkedin());
+        }
     }
 }
