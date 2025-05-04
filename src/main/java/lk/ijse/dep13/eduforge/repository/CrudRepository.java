@@ -1,5 +1,6 @@
 package lk.ijse.dep13.eduforge.repository;
 
+import jakarta.persistence.EntityManager;
 import lk.ijse.dep13.eduforge.entity.SuperEntity;
 
 import java.io.Serializable;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CrudRepository<T extends SuperEntity, ID extends Serializable> extends SuperRepository {
+
+    EntityManager getEntityManager();
 
     T save(T entity);
 
