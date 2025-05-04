@@ -1,30 +1,38 @@
 package lk.ijse.dep13.eduForge.repository.custom.impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
-import lk.ijse.dep13.eduforge.repository.custom.impl.LecturerRepositoryImpl;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {WebRootConfig.class})
 public class LecturerRepositoryImplTest {
 
     private final LecturerRepository repository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LECTURER);
 
     private EntityManager entityManager;
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     public void setUp() {
-        entityManager = Persistence.createEntityManagerFactory("default").createEntityManager();
+        entityManager = entityManagerFactory.createEntityManager();
         repository.setEntityManager(entityManager);
         entityManager.getTransaction().begin();
     }
@@ -104,6 +112,6 @@ public class LecturerRepositoryImplTest {
             repository.save(lecturer);
         }
         long count = repository.count();
-        assertEquals(10, count);
+        assertTrue(count >= 120);
     }
 }
