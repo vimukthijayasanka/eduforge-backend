@@ -2,6 +2,7 @@ package lk.ijse.dep13.eduForge.service;
 
 import lk.ijse.dep13.eduforge.WebAppConfig;
 import lk.ijse.dep13.eduforge.WebRootConfig;
+import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
@@ -43,6 +44,25 @@ public class TransformerTest {
         assertEquals(lecturerTO.getQualification(), lecturer.getQualification());
         assertEquals(lecturerTO.getDisplayOrder(), lecturer.getDisplayOrder());
         assertEquals(lecturerTO.getLinkedin(), lecturer.getLinkedin().getUrl());
+    }
 
+    @Test
+    void fromLecturerReqTO(){
+        LecturerReqTO lecturerReqTO = new LecturerReqTO(
+                "Abby",
+                "Senior Lecturer",
+                "MSc in Nuclear Physics",
+                LecturerType.FULL_TIME,
+                10,
+                null,
+                "https://linkedin.com/abby"
+        );
+        Lecturer lecturer = transformer.fromLecturerReqTO(lecturerReqTO);
+        assertEquals(lecturerReqTO.getName(), lecturer.getName());
+        assertEquals(lecturerReqTO.getDesignation(), lecturer.getDesignation());
+        assertEquals(lecturerReqTO.getQualification(), lecturer.getQualification());
+        assertEquals(lecturerReqTO.getType(), lecturer.getType());
+        assertEquals(lecturerReqTO.getDisplayOrder(), lecturer.getDisplayOrder());
+        assertEquals(lecturerReqTO.getLinkedin(), lecturer.getLinkedin().getUrl());
     }
 }
