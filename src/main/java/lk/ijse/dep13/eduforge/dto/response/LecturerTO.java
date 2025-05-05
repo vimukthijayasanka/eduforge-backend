@@ -1,21 +1,18 @@
-package lk.ijse.dep13.eduforge.dto.request;
+package lk.ijse.dep13.eduforge.dto.response;
 
 import jakarta.validation.constraints.*;
-import jakarta.validation.groups.Default;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import lk.ijse.dep13.eduforge.validation.LecturerProfileImage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class LecturerUpdateReqTO implements Serializable {
+@NoArgsConstructor
+public class LecturerTO implements Serializable {
     @NotBlank(message = "Name can't be empty")
     @Pattern(regexp = "^[A-Za-z ]{2,}$", message = "Invalid name")
     private String name;
@@ -31,7 +28,7 @@ public class LecturerUpdateReqTO implements Serializable {
     @PositiveOrZero(message = "Invalid display order")
     private Integer displayOrder;
     @Null(message = "Picture should be empty")
-    private String picture;
+    private String picturePath;
     @Pattern(regexp = "^http(s)://.+$", message = "Invalid linkedIn URL")
     private String linkedin;
 }

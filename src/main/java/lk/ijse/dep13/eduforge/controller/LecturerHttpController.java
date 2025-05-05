@@ -6,8 +6,7 @@ import com.google.cloud.storage.Storage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
-import lk.ijse.dep13.eduforge.dto.request.LecturerUpdateReqTO;
-import lk.ijse.dep13.eduforge.dto.response.LecturerResTO;
+import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
@@ -19,10 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,7 +38,7 @@ public class LecturerHttpController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data", produces = "application/json")
-    public LecturerResTO createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
+    public LecturerTO createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
         System.out.println(lecturerReqTO);
         entityManager.getTransaction().begin();
         try{
@@ -49,21 +46,21 @@ public class LecturerHttpController {
             lecturer.setPicture(null); // model mapper create new object if picture is empty, so have to make it null
             lecturer.setLinkedin(null);
             entityManager.persist(lecturer);
-            LecturerResTO lecturerResTO = modelMapper.map(lecturer, LecturerResTO.class);
+            LecturerTO lecturerTO = modelMapper.map(lecturer, LecturerTO.class);
 
             if (lecturerReqTO.getPicture() != null) {
                 Picture picture = new Picture(lecturer, "lecturers/" + lecturer.getId());
                 entityManager.persist(picture);
                 Blob blobId = bucket.create(picture.getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
-                lecturerResTO.setPicturePath(blobId.signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+                lecturerTO.setPicturePath(blobId.signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
             }
             if (lecturerReqTO.getLinkedin() != null) {
                 entityManager.persist(new LinkedIn(lecturer, lecturerReqTO.getLinkedin()));
-                lecturerResTO.setLinkedin(lecturerReqTO.getLinkedin());
+                lecturerTO.setLinkedin(lecturerReqTO.getLinkedin());
             }
 
             entityManager.getTransaction().commit();
-            return lecturerResTO;
+            return lecturerTO;
         }catch (IOException t){
             entityManager.getTransaction().rollback();
             throw new RuntimeException(t);
@@ -71,15 +68,15 @@ public class LecturerHttpController {
     }
 
     @GetMapping(value = "/{lecturer-id}", produces = "application/json")
-    public LecturerResTO getLecturerDetails(@PathVariable("lecturer-id") Integer lecturerId){
+    public LecturerTO getLecturerDetails(@PathVariable("lecturer-id") Integer lecturerId){
         Lecturer lecturer = entityManager.find(Lecturer.class, lecturerId);
         if (lecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer not found" );
-        LecturerResTO lecturerResTO = modelMapper.map(lecturer, LecturerResTO.class);
-        if (lecturer.getLinkedin() != null) lecturerResTO.setLinkedin(lecturer.getLinkedin().getUrl());
+        LecturerTO lecturerTO = modelMapper.map(lecturer, LecturerTO.class);
+        if (lecturer.getLinkedin() != null) lecturerTO.setLinkedin(lecturer.getLinkedin().getUrl());
         if (lecturer.getPicture() != null) {
-            lecturerResTO.setPicturePath(bucket.get(lecturer.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+            lecturerTO.setPicturePath(bucket.get(lecturer.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
         }
-        return lecturerResTO;
+        return lecturerTO;
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -127,7 +124,7 @@ public class LecturerHttpController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{lecturer-id}", consumes = "application/json")
     public void updateLecturerDetailsViaJson(@PathVariable("lecturer-id") Integer lecturerId,
-                                             @RequestBody @Validated LecturerUpdateReqTO lecturerUpdateReqTO){
+                                             @RequestBody @Validated LecturerTO lecturerUpdateReqTO){
         Lecturer currentLecturer = entityManager.find(Lecturer.class, lecturerId);
         if (currentLecturer == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lecturer Not Found");
         entityManager.getTransaction().begin();
@@ -167,31 +164,31 @@ public class LecturerHttpController {
     }
 
     @GetMapping(produces = "application/json")
-    public List<LecturerResTO> getAllLecturers(){
+    public List<LecturerTO> getAllLecturers(){
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l", Lecturer.class);
         return getLecturerTOList(query);
     }
 
     @GetMapping(params = "type=full-time",produces = "application/json")
-    public List<LecturerResTO> getFullTimeLecturers(){
+    public List<LecturerTO> getFullTimeLecturers(){
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l WHERE l.type = lk.ijse.dep13.eduforge.util.LecturerType.FULL_TIME", Lecturer.class);
         return getLecturerTOList(query);
     }
 
     @GetMapping(params = "type=visiting", produces = "application/json")
-    public List<LecturerResTO> getVisitingLecturers(){
+    public List<LecturerTO> getVisitingLecturers(){
         TypedQuery<Lecturer> query = entityManager.createQuery("SELECT l FROM Lecturer l WHERE l.type = lk.ijse.dep13.eduforge.util.LecturerType.VISITING", Lecturer.class);
         return getLecturerTOList(query);
     }
 
-    private List<LecturerResTO> getLecturerTOList(TypedQuery<Lecturer> query) {
+    private List<LecturerTO> getLecturerTOList(TypedQuery<Lecturer> query) {
         return query.getResultStream().map(lecturerEntity -> {
-            LecturerResTO lecturerResTO = modelMapper.map(lecturerEntity, LecturerResTO.class);
-            if (lecturerEntity.getLinkedin() != null) lecturerResTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
+            LecturerTO lecturerTO = modelMapper.map(lecturerEntity, LecturerTO.class);
+            if (lecturerEntity.getLinkedin() != null) lecturerTO.setLinkedin(lecturerEntity.getLinkedin().getUrl());
             if (lecturerEntity.getPicture() != null) {
-                lecturerResTO.setPicturePath(bucket.get(lecturerEntity.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+                lecturerTO.setPicturePath(bucket.get(lecturerEntity.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
             }
-            return lecturerResTO;
+            return lecturerTO;
         }).collect(Collectors.toList());
     }
 

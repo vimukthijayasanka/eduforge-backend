@@ -1,7 +1,7 @@
 package lk.ijse.dep13.eduforge.service.impl;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
-import lk.ijse.dep13.eduforge.dto.response.LecturerResTO;
+import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
@@ -27,7 +27,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public LecturerResTO saveLecturer(LecturerReqTO lecturerReqTO) {
+    public LecturerTO saveLecturer(LecturerReqTO lecturerReqTO) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             AppStore.getEntityManager().getTransaction().commit();
@@ -72,7 +72,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public LecturerResTO getLecturerDetails(Integer lecturerId) {
+    public LecturerTO getLecturerDetails(Integer lecturerId) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             AppStore.getEntityManager().getTransaction().commit();
@@ -84,7 +84,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public List<LecturerResTO> getAllLecturers(LecturerType lecturerType) {
+    public List<LecturerTO> getAllLecturers(LecturerType lecturerType) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             AppStore.getEntityManager().getTransaction().commit();
