@@ -7,6 +7,7 @@ import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
+import lk.ijse.dep13.eduforge.exception.AppException;
 import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
@@ -22,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 public class LecturerServiceImpl implements LecturerService {
 
-    private final LecturerRepository lecturerRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LECTURER);
+    private LecturerRepository lecturerRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LECTURER);
 
-    private final LinkedInRepository linkedInRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LINKEDIN);
+    private LinkedInRepository linkedInRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LINKEDIN);
 
-    private final PictureRepository pictureRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.PICTURE);
+    private PictureRepository pictureRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.PICTURE);
 
-    private final Transformer transformer = new Transformer();
+    private Transformer transformer = new Transformer();
 
     public LecturerServiceImpl() {
         lecturerRepository.setEntityManager(AppStore.getEntityManager());
@@ -41,10 +42,10 @@ public class LecturerServiceImpl implements LecturerService {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             Lecturer lecturer = transformer.fromLecturerReqTO(lecturerReqTO);
-            lecturer = lecturerRepository.save(lecturer);
+            lecturerRepository.save(lecturer);
 
             if (lecturerReqTO.getLinkedin() != null) {
-                linkedInRepository.save(new LinkedIn(lecturer, lecturerReqTO.getLinkedin()));
+                linkedInRepository.save(lecturer.getLinkedin());
             }
 
             String signUrl = null;
@@ -63,9 +64,9 @@ public class LecturerServiceImpl implements LecturerService {
             LecturerTO lecturerTO = transformer.toLecturerTO(lecturer);
             lecturerTO.setPicturePath(signUrl);
             return lecturerTO;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to save the lecturer", e, 500);
         }
     }
 

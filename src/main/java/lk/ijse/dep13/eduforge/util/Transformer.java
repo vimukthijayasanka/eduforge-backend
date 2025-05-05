@@ -4,7 +4,9 @@ import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
+import lk.ijse.dep13.eduforge.entity.Picture;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,26 +15,20 @@ public class Transformer {
     private final ModelMapper mapper = new ModelMapper();
 
     public Transformer() {
-        mapper.typeMap(LinkedIn.class, String.class).setConverter(context -> context.getSource().getUrl());
-        mapper.typeMap(String.class, LinkedIn.class).setConverter(mappingContext -> new LinkedIn(null, mappingContext.getSource()));
+        mapper.typeMap(LinkedIn.class, String.class).setConverter(context -> context.getSource() !=null ? context.getSource().getUrl() : null);
+        mapper.typeMap(MultipartFile.class, Picture.class).setConverter(context -> null);
+        mapper.typeMap(String.class, LinkedIn.class).setConverter(mappingContext -> mappingContext.getSource() != null ? new LinkedIn(null, mappingContext.getSource()) : null);
     }
 
     public Lecturer fromLecturerReqTO(LecturerReqTO lecturerReqTO){
        Lecturer lecturer = mapper.map(lecturerReqTO, Lecturer.class);
-       if (lecturerReqTO.getLinkedin() == null) {
-           lecturer.setLinkedin(null);
-       } else{
-           lecturer.getLinkedin().setLecturer(lecturer);
-       }
-       if (lecturerReqTO.getPicture() == null || lecturerReqTO.getPicture().isEmpty()) {
-           lecturer.setPicture(null);
-       }
+       if (lecturerReqTO.getLinkedin() != null) lecturer.getLinkedin().setLecturer(lecturer);
        return lecturer;
     }
 
     public Lecturer fromLecturerTO(LecturerTO lecturerTO){
         Lecturer lecturer = mapper.map(lecturerTO, Lecturer.class);
-        lecturer.getLinkedin().setLecturer(lecturer);
+        if (lecturerTO.getLinkedin() != null) lecturer.getLinkedin().setLecturer(lecturer);
         return lecturer;
     }
 
