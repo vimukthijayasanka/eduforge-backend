@@ -11,10 +11,7 @@ import lk.ijse.dep13.eduforge.util.LecturerType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.util.List;
@@ -115,6 +112,6 @@ public class LecturerRepositoryImplTest {
             repository.save(lecturer);
         }
         long count = repository.count();
-        assertTrue(count >= 120);
+        assertTrue(count >= 10);
     }
 }

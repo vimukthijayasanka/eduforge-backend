@@ -5,7 +5,7 @@ import lk.ijse.dep13.eduforge.entity.Picture;
 import lk.ijse.dep13.eduforge.repository.CrudRepository;
 
 
-public interface PictureRepository extends CrudRepository<Picture, Lecturer> {
+public interface PictureRepository extends CrudRepository<Picture, Integer> {
 
 
 }

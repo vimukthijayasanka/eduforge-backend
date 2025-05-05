@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringJUnitWebConfig(classes = {WebRootConfig.class})
@@ -76,7 +78,7 @@ public class LinkedInRepositoryImplTest {
         entityManager.persist(lecturer);
         LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
         repository.save(linkedIn);
-        repository.deleteById(lecturer);
+        repository.deleteById(lecturer.getId());
 
         LinkedIn dbLinkedIn = entityManager.find(LinkedIn.class, lecturer.getId());
         assertNull(dbLinkedIn);
@@ -84,17 +86,59 @@ public class LinkedInRepositoryImplTest {
 
     @Test
     void existsById() {
+        Lecturer lecturer = new Lecturer("Kasun Sampath",
+                "Associate Instructor",
+                "BSc (Hons) in Computing",
+                LecturerType.VISITING, 0);
+        entityManager.persist(lecturer);
+        LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
+        repository.save(linkedIn);
+        boolean result = repository.existsById(lecturer.getId());
+        boolean result2 = repository.existsById(-500);
+        assertTrue(result);
+        assertFalse(result2);
     }
 
     @Test
     void findById() {
+        Lecturer lecturer = new Lecturer("Kasun Sampath",
+                "Associate Instructor",
+                "BSc (Hons) in Computing",
+                LecturerType.VISITING, 0);
+        entityManager.persist(lecturer);
+        LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
+        repository.save(linkedIn);
+        LinkedIn dbLinkedIn = repository.findById(lecturer.getId()).orElse(null);
+        assertNotNull(dbLinkedIn);
     }
 
     @Test
     void findAll() {
+        for (int i = 0; i < 8; i++) {
+            Lecturer lecturer = new Lecturer("Kasun Sampath",
+                    "Associate Instructor",
+                    "BSc (Hons) in Computing",
+                    LecturerType.VISITING, 0);
+            entityManager.persist(lecturer);
+            LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
+            repository.save(linkedIn);
+        }
+        List<LinkedIn> allLinkedIn = repository.findAll();
+        assertEquals(8, allLinkedIn.size());
     }
 
     @Test
     void count() {
+        for (int i = 0; i < 10; i++) {
+            Lecturer lecturer = new Lecturer("Kasun Sampath",
+                    "Associate Instructor",
+                    "BSc (Hons) in Computing",
+                    LecturerType.VISITING, 0);
+            entityManager.persist(lecturer);
+            LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
+            repository.save(linkedIn);
+        }
+        long count = repository.count();
+        assertTrue(count >= 10);
     }
 }
