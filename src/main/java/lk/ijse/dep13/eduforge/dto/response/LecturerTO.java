@@ -13,6 +13,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LecturerTO implements Serializable {
+    @Null(message = "Id should be empty")
+    private Integer id;
     @NotBlank(message = "Name can't be empty")
     @Pattern(regexp = "^[A-Za-z ]{2,}$", message = "Invalid name")
     private String name;

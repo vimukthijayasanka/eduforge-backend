@@ -11,19 +11,26 @@ import java.util.stream.Collectors;
 public class Transformer {
     private final ModelMapper mapper = new ModelMapper();
 
-    Lecturer fromLecturerReqTO(LecturerReqTO lecturerReqTO){
+    public Lecturer fromLecturerReqTO(LecturerReqTO lecturerReqTO){
         return mapper.map(lecturerReqTO, Lecturer.class);
     }
 
-    Lecturer fromLecturerResTO(LecturerTO lecturerTO){
+    public Lecturer fromLecturerResTO(LecturerTO lecturerTO){
         return mapper.map(lecturerTO, Lecturer.class);
     }
 
-    LecturerTO toLecturerTO(Lecturer lecturer){
-        return mapper.map(lecturer, LecturerTO.class);
+    public LecturerTO toLecturerTO(Lecturer lecturer){
+        LecturerTO lecturerTO = mapper.map(lecturer, LecturerTO.class);
+
+        // Manually set the LinkedIn URL (if the LinkedIn object is not null)
+        if (lecturer.getLinkedin() != null) {
+            lecturerTO.setLinkedin(lecturer.getLinkedin().getUrl());
+        }
+
+        return lecturerTO;
     }
 
-    List<LecturerTO> toLecturerTOList(List<Lecturer> lecturerList){
+    public List<LecturerTO> toLecturerTOList(List<Lecturer> lecturerList){
         return lecturerList.stream().map(this::toLecturerTO).collect(Collectors.toList());
     }
 
