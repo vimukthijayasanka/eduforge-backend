@@ -3,6 +3,7 @@ package lk.ijse.dep13.eduforge.util;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
+import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
@@ -10,6 +11,10 @@ import java.util.stream.Collectors;
 
 public class Transformer {
     private final ModelMapper mapper = new ModelMapper();
+
+    public Transformer() {
+        mapper.typeMap(LinkedIn.class, String.class).setConverter(context -> context.getSource().getUrl());
+    }
 
     public Lecturer fromLecturerReqTO(LecturerReqTO lecturerReqTO){
         return mapper.map(lecturerReqTO, Lecturer.class);
