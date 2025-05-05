@@ -32,4 +32,17 @@ public class TransformerTest {
         assertEquals(lecturer.getType(), lecturerTO.getType());
         assertEquals(lecturer.getLinkedin().getUrl(), lecturerTO.getLinkedin());
     }
+
+    @Test
+    void fromLecturerTo(){
+        LecturerTO lecturerTO = new LecturerTO(2, "Joel Miller", "Probationary lecturer", "Bsc in Management and Finance", LecturerType.FULL_TIME, 5, null, "https://linkedin.com/joel-miller");
+        Lecturer lecturer = transformer.fromLecturerTO(lecturerTO);
+        assertEquals(lecturerTO.getId(), lecturer.getId());
+        assertEquals(lecturerTO.getName(), lecturer.getName());
+        assertEquals(lecturerTO.getDesignation(), lecturer.getDesignation());
+        assertEquals(lecturerTO.getQualification(), lecturer.getQualification());
+        assertEquals(lecturerTO.getDisplayOrder(), lecturer.getDisplayOrder());
+        assertEquals(lecturerTO.getLinkedin(), lecturer.getLinkedin().getUrl());
+
+    }
 }

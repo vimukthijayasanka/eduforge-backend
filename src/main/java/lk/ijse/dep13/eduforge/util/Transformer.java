@@ -14,14 +14,17 @@ public class Transformer {
 
     public Transformer() {
         mapper.typeMap(LinkedIn.class, String.class).setConverter(context -> context.getSource().getUrl());
+        mapper.typeMap(String.class, LinkedIn.class).setConverter(mappingContext -> new LinkedIn(null, mappingContext.getSource()));
     }
 
     public Lecturer fromLecturerReqTO(LecturerReqTO lecturerReqTO){
         return mapper.map(lecturerReqTO, Lecturer.class);
     }
 
-    public Lecturer fromLecturerResTO(LecturerTO lecturerTO){
-        return mapper.map(lecturerTO, Lecturer.class);
+    public Lecturer fromLecturerTO(LecturerTO lecturerTO){
+        Lecturer lecturer = mapper.map(lecturerTO, Lecturer.class);
+        lecturer.getLinkedin().setLecturer(lecturer);
+        return lecturer;
     }
 
     public LecturerTO toLecturerTO(Lecturer lecturer){
