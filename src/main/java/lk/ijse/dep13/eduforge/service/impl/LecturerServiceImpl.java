@@ -26,8 +26,23 @@ public class LecturerServiceImpl implements LecturerService {
     private LecturerRepository lecturerRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LECTURER);
 
     private LinkedInRepository linkedInRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LINKEDIN);
-
     private PictureRepository pictureRepository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.PICTURE);
+
+//    public void setLecturerRepository(LecturerRepository lecturerRepository) {
+//        this.lecturerRepository = lecturerRepository;
+//                lecturerRepository.setEntityManager(AppStore.getEntityManager());
+//
+//    }
+//
+//    public void setLinkedInRepository(LinkedInRepository linkedInRepository) {
+//        this.linkedInRepository = linkedInRepository;
+//        linkedInRepository.setEntityManager(AppStore.getEntityManager());
+//    }
+//
+//    public void setPictureRepository(PictureRepository pictureRepository) {
+//        this.pictureRepository = pictureRepository;
+//        pictureRepository.setEntityManager(AppStore.getEntityManager());
+//    }
 
     private Transformer transformer = new Transformer();
 
