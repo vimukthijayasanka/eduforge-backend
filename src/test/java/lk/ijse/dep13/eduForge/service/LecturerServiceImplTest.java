@@ -91,4 +91,25 @@ public class LecturerServiceImplTest {
         assumingThat(lecturerReqTO.getLinkedin() != null, ()-> assertEquals(lecturerReqTO.getLinkedin(), lecturerTO.getLinkedin()) );
         assumingThat(lecturerReqTO.getLinkedin() == null, ()-> assertNull(lecturerTO.getLinkedin()));
     }
+
+    @Test
+    void deleteLecturer(){}
+
+    @Test
+    void getLecturerDetails(){}
+
+    @Test
+    void getAllLecturers(){
+        for (int i = 0; i < 10; i++) {
+            LecturerReqTO lecturerReqTO = new LecturerReqTO("Pedro Pascal",
+                    "Professor",
+                    "BSc, MSc, PHD",
+                    i < 5 ? LecturerType.FULL_TIME : LecturerType.VISITING, 0, null, "https://linkedin.com/pedro-pascal");
+            lecturerService.saveLecturer(lecturerReqTO);
+        }
+        assertTrue(lecturerService.getAllLecturers(null).size() >= 10);
+        assertTrue(lecturerService.getAllLecturers(LecturerType.FULL_TIME).size() >= 5);
+        assertTrue(lecturerService.getAllLecturers(LecturerType.VISITING).size() >= 5);
+
+    }
 }
