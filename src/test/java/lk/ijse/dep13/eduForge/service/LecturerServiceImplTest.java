@@ -9,6 +9,7 @@ import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
+import lk.ijse.dep13.eduforge.exception.AppException;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
 import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
@@ -93,10 +94,28 @@ public class LecturerServiceImplTest {
     }
 
     @Test
-    void deleteLecturer(){}
+    void deleteLecturer(){
+        LecturerReqTO lecturerReqTO = new LecturerReqTO("Pedro Pascal",
+                "Professor",
+                "BSc, MSc, PHD",
+                LecturerType.FULL_TIME, 0, null, "https://linkedin.com/pedro-pascal");
+        LecturerTO lecturerTO = lecturerService.saveLecturer(lecturerReqTO);
+        lecturerService.deleteLecturer(lecturerTO.getId());
+        assertThrows(AppException.class, ()-> lecturerService.getLecturerDetails(lecturerTO.getId()) );
+        assertThrows(AppException.class, ()-> lecturerService.getLecturerDetails(-200) );
+    }
 
     @Test
-    void getLecturerDetails(){}
+    void getLecturerDetails(){
+        LecturerReqTO lecturerReqTO = new LecturerReqTO("Pedro Pascal",
+                "Professor",
+                "BSc, MSc, PHD",
+                LecturerType.FULL_TIME, 0, null, "https://linkedin.com/pedro-pascal");
+        LecturerTO lecturerTO = lecturerService.saveLecturer(lecturerReqTO);
+        LecturerTO lecturerDetails = lecturerService.getLecturerDetails(lecturerTO.getId());
+        assertEquals(lecturerTO, lecturerDetails);
+        assertThrows(AppException.class, ()-> lecturerService.getLecturerDetails(-200) );
+    }
 
     @Test
     void getAllLecturers(){
@@ -111,5 +130,19 @@ public class LecturerServiceImplTest {
         assertTrue(lecturerService.getAllLecturers(LecturerType.FULL_TIME).size() >= 5);
         assertTrue(lecturerService.getAllLecturers(LecturerType.VISITING).size() >= 5);
 
+    }
+
+    @Test
+    void updateLecturerDetails(){
+        LecturerReqTO lecturerReqTO = new LecturerReqTO("Pedro Pascal",
+                "Professor",
+                "BSc, MSc, PHD",
+                LecturerType.FULL_TIME, 0, null, "https://linkedin.com/pedro-pascal");
+        LecturerTO lecturerTO = lecturerService.saveLecturer(lecturerReqTO);
+        lecturerTO.setLinkedin("https://linkedin.com/pedro-pascal-updated");
+        lecturerTO.setDisplayOrder(10);
+        lecturerService.updateLecturerDetails(lecturerTO);
+        LecturerTO updatedLecturer = lecturerService.getLecturerDetails(lecturerTO.getId());
+        assertEquals(lecturerTO, updatedLecturer);
     }
 }
