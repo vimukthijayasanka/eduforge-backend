@@ -37,6 +37,16 @@ public class LecturerReqTO implements Serializable {
     @Pattern(regexp = "^http(s)://.+$", message = "Invalid linkedIn URL")
     private String linkedin;
 
+    public LecturerReqTO(String name, String designation, String qualification, LecturerType type, Integer displayOrder, MultipartFile picture, String linkedin) {
+        this.name = name;
+        this.designation = designation;
+        this.qualification = qualification;
+        this.type = type;
+        this.displayOrder = displayOrder;
+        this.picture = picture;
+        this.linkedin = linkedin;
+    }
+
     public interface Create extends Default {}
     public interface Update extends Default {}
 }

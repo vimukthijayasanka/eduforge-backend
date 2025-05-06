@@ -143,7 +143,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void deleteLecturer(Integer lecturerId) {
-        if (lecturerRepository.existsById(lecturerId)) throw new AppException("Lecturer not found", 404);
+        if (!lecturerRepository.existsById(lecturerId)) throw new AppException("Lecturer not found", 404);
         AppStore.getEntityManager().getTransaction().begin();
         try{
             lecturerRepository.deleteById(lecturerId);
@@ -166,9 +166,9 @@ public class LecturerServiceImpl implements LecturerService {
             }
             AppStore.getEntityManager().getTransaction().commit();
             return lecturerTO;
-        }catch (Exception e){
+        }catch (Throwable e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to find the lecturer", e, 500);
         }
     }
 
