@@ -10,6 +10,8 @@ import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
+import lk.ijse.dep13.eduforge.service.ServiceFactory;
+import lk.ijse.dep13.eduforge.service.custom.LecturerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,40 +33,15 @@ public class LecturerHttpController {
     private EntityManager entityManager;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private Bucket bucket;
+
+    private final LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data", produces = "application/json")
     public LecturerTO createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO){
-        System.out.println(lecturerReqTO);
-        entityManager.getTransaction().begin();
-        try{
-            Lecturer lecturer = modelMapper.map(lecturerReqTO, Lecturer.class);
-            lecturer.setPicture(null); // model mapper create new object if picture is empty, so have to make it null
-            lecturer.setLinkedin(null);
-            entityManager.persist(lecturer);
-            LecturerTO lecturerTO = modelMapper.map(lecturer, LecturerTO.class);
-
-            if (lecturerReqTO.getPicture() != null) {
-                Picture picture = new Picture(lecturer, "lecturers/" + lecturer.getId());
-                entityManager.persist(picture);
-                Blob blobId = bucket.create(picture.getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
-                lecturerTO.setPicturePath(blobId.signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
-            }
-            if (lecturerReqTO.getLinkedin() != null) {
-                entityManager.persist(new LinkedIn(lecturer, lecturerReqTO.getLinkedin()));
-                lecturerTO.setLinkedin(lecturerReqTO.getLinkedin());
-            }
-
-            entityManager.getTransaction().commit();
-            return lecturerTO;
-        }catch (IOException t){
-            entityManager.getTransaction().rollback();
-            throw new RuntimeException(t);
-        }
+        return lecturerService.saveLecturer(lecturerReqTO);
     }
 
     @GetMapping(value = "/{lecturer-id}", produces = "application/json")
