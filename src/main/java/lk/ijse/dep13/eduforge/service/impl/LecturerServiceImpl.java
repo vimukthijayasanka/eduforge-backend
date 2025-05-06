@@ -123,12 +123,20 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void updateLecturerDetails(LecturerTO lecturerTO) {
+        Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerTO.getId());
+        if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
+        Lecturer currentLecturer = optLecturer.get();
+
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            Lecturer newLecturer = transformer.fromLecturerTO(lecturerTO);
+            newLecturer.setPicture(currentLecturer.getPicture());
+            updateLinkedIn(currentLecturer, newLecturer);
+            lecturerRepository.update(newLecturer);
             AppStore.getEntityManager().getTransaction().commit();
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to update the lecturer details", e, 500);
         }
     }
 
