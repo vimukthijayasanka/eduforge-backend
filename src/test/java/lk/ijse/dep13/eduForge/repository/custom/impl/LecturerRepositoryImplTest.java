@@ -2,10 +2,11 @@ package lk.ijse.dep13.eduForge.repository.custom.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lk.ijse.dep13.eduforge.WebAppConfig;
 import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
-import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import org.junit.jupiter.api.AfterEach;
@@ -22,26 +23,14 @@ import static org.junit.jupiter.api.Assertions.*;
 //@ExtendWith(SpringExtension.class)
 //@ContextConfiguration(classes = {WebRootConfig.class})
 @SpringJUnitWebConfig(classes = {WebRootConfig.class, WebAppConfig.class})
+@Transactional
 public class LecturerRepositoryImplTest {
 
-    private final LecturerRepository repository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LECTURER);
-
-    private EntityManager entityManager;
     @Autowired
-    private EntityManagerFactory entityManagerFactory;
+    private LecturerRepository repository;
 
-    @BeforeEach
-    public void setUp() {
-        entityManager = entityManagerFactory.createEntityManager();
-        repository.setEntityManager(entityManager);
-        entityManager.getTransaction().begin();
-    }
-
-    @AfterEach
-    void tearDown() {
-        entityManager.getTransaction().commit();
-        entityManager.close();
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     void save(){

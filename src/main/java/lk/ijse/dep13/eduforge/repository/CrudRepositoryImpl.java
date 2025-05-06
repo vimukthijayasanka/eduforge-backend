@@ -1,6 +1,7 @@
 package lk.ijse.dep13.eduforge.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lk.ijse.dep13.eduforge.entity.SuperEntity;
 
 import java.lang.reflect.ParameterizedType;
@@ -17,6 +18,7 @@ public abstract class CrudRepositoryImpl<T extends SuperEntity, ID extends java.
         entityClzObj = (Class<T>)((ParameterizedType)(this.getClass().getGenericSuperclass())).getActualTypeArguments()[0];
     }
 
+    @PersistenceContext
     @Override
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
