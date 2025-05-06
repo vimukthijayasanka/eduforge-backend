@@ -85,7 +85,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public void updateLecturerDetailsWithImage(LecturerReqTO lecturerReqTO) {
+    public void updateLecturerDetails(LecturerReqTO lecturerReqTO) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             AppStore.getEntityManager().getTransaction().commit();
@@ -96,7 +96,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public void updateLecturerDetailsWithoutImage(LecturerReqTO lecturerReqTO) {
+    public void updateLecturerDetails(LecturerTO lecturerTO) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
             AppStore.getEntityManager().getTransaction().commit();

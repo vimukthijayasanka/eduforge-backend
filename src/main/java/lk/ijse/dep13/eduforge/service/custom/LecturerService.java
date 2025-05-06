@@ -18,9 +18,9 @@ public interface LecturerService extends SuperService {
 
     LecturerTO saveLecturer(LecturerReqTO lecturerReqTO);
 
-    void updateLecturerDetailsWithImage(LecturerReqTO lecturerReqTO);
+    void updateLecturerDetails(LecturerReqTO lecturerReqTO);
 
-    void updateLecturerDetailsWithoutImage(LecturerReqTO lecturerReqTO);
+    void updateLecturerDetails(LecturerTO lecturerTO);
 
     void deleteLecturer(Integer lecturerId);
 
