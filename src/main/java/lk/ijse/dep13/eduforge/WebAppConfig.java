@@ -9,19 +9,20 @@ import lk.ijse.dep13.eduforge.converter.LecturerTypeConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class WebAppConfig implements WebMvcConfigurer {
 
     @Bean

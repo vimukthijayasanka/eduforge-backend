@@ -1,0 +1,6 @@
+2025-05-06 21:08:04 [main] WARN  o.h.j.b.i.PersistenceXmlParser -- HHH015018: Encountered multiple persistence-unit stanzas defining same name [default]; persistence-unit names must be unique
+2025-05-06 21:08:04 [main] WARN  org.hibernate.orm.deprecation -- HHH90000021: Encountered deprecated setting [javax.persistence.jdbc.user], use [jakarta.persistence.jdbc.user] instead
+2025-05-06 21:08:04 [main] WARN  org.hibernate.orm.deprecation -- HHH90000021: Encountered deprecated setting [javax.persistence.jdbc.password], use [jakarta.persistence.jdbc.password] instead
+2025-05-06 21:08:04 [main] WARN  org.hibernate.orm.deprecation -- HHH90000021: Encountered deprecated setting [javax.persistence.jdbc.url], use [jakarta.persistence.jdbc.url] instead
+2025-05-06 21:08:04 [main] WARN  org.hibernate.orm.deprecation -- HHH90000021: Encountered deprecated setting [javax.persistence.jdbc.driver], use [jakarta.persistence.jdbc.driver] instead
+2025-05-06 21:08:04 [main] WARN  o.hibernate.orm.connections.pooling -- HHH10001002: Using built-in connection pool (not intended for production use)
