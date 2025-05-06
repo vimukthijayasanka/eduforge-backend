@@ -26,14 +26,13 @@ public class LecturerHttpController {
     @Autowired
     private Bucket bucket;
 
-    private final LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
-
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data", produces = "application/json")
     public LecturerTO createNewLecturer(@ModelAttribute @Validated(LecturerReqTO.Create.class) LecturerReqTO lecturerReqTO) {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         return lecturerService.saveLecturer(lecturerReqTO);
     }
 
@@ -41,6 +40,7 @@ public class LecturerHttpController {
     public LecturerTO getLecturerDetails(@PathVariable("lecturer-id") Integer lecturerId) {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         return lecturerService.getLecturerDetails(lecturerId);
     }
 
@@ -51,6 +51,7 @@ public class LecturerHttpController {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
         lecturerReqTO.setId(lecturerId);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         lecturerService.updateLecturerDetails(lecturerReqTO);
     }
 
@@ -61,6 +62,7 @@ public class LecturerHttpController {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
         lecturerTO.setId(lecturerId);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         lecturerService.updateLecturerDetails(lecturerTO);
     }
 
@@ -69,6 +71,7 @@ public class LecturerHttpController {
     public void deleteLecturer(@PathVariable("lecturer-id") Integer lecturerId) {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         lecturerService.deleteLecturer(lecturerId);
     }
 
@@ -76,6 +79,7 @@ public class LecturerHttpController {
     public List<LecturerTO> getAllLecturers() {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         return lecturerService.getAllLecturers(null);
     }
 
@@ -83,6 +87,7 @@ public class LecturerHttpController {
     public List<LecturerTO> getFullTimeLecturers() {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         return lecturerService.getAllLecturers(LecturerType.FULL_TIME);
     }
 
@@ -90,6 +95,7 @@ public class LecturerHttpController {
     public List<LecturerTO> getVisitingLecturers() {
         AppStore.setEntityManager(entityManager);
         AppStore.setBucket(bucket);
+        LecturerService lecturerService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.LECTURER);
         return lecturerService.getAllLecturers(LecturerType.VISITING);
     }
 }

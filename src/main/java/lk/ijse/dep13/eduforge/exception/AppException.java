@@ -1,5 +1,8 @@
 package lk.ijse.dep13.eduforge.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AppException extends RuntimeException {
     private final int errorCode;
 
