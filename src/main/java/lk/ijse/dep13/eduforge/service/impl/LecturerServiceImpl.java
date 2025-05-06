@@ -19,7 +19,9 @@ import lk.ijse.dep13.eduforge.util.Transformer;
 
 import javax.xml.transform.TransformerFactory;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class LecturerServiceImpl implements LecturerService {
 
@@ -86,34 +88,69 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void updateLecturerDetails(LecturerReqTO lecturerReqTO) {
+        Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerReqTO.getId());
+        if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
+        Lecturer currentLecturer = optLecturer.get();
+
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            Lecturer newLecturer = transformer.fromLecturerReqTO(lecturerReqTO);
+            if (lecturerReqTO.getPicture() != null) {
+                newLecturer.setPicture(new Picture(newLecturer, "lecturers/" + currentLecturer.getId()));
+            }
+            if (lecturerReqTO.getLinkedin() != null) {
+                newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
+            }
+            updateLinkedIn(currentLecturer, newLecturer);
+
+            if (newLecturer.getPicture() != null && currentLecturer.getPicture() == null) {
+                pictureRepository.save(newLecturer.getPicture());
+                AppStore.getBucket().create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+            } else if (newLecturer.getPicture() == null && currentLecturer.getPicture() != null) {
+                pictureRepository.deleteById(currentLecturer.getId());
+                AppStore.getBucket().get(currentLecturer.getPicture().getPicturePath()).delete();
+            } else if (newLecturer.getPicture() != null) {
+                pictureRepository.update(newLecturer.getPicture());
+                AppStore.getBucket().create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+            }
+
+            lecturerRepository.update(newLecturer);
             AppStore.getEntityManager().getTransaction().commit();
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to update the lecturer details", e, 500);
         }
     }
 
     @Override
     public void updateLecturerDetails(LecturerTO lecturerTO) {
+        Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerTO.getId());
+        if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
+        Lecturer currentLecturer = optLecturer.get();
+
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            Lecturer newLecturer = transformer.fromLecturerTO(lecturerTO);
+            newLecturer.setPicture(currentLecturer.getPicture());
+            updateLinkedIn(currentLecturer, newLecturer);
+            lecturerRepository.update(newLecturer);
             AppStore.getEntityManager().getTransaction().commit();
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to update the lecturer details", e, 500);
         }
     }
 
     @Override
     public void deleteLecturer(Integer lecturerId) {
+        if (!lecturerRepository.existsById(lecturerId)) throw new AppException("Lecturer not found", 404);
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            lecturerRepository.deleteById(lecturerId);
             AppStore.getEntityManager().getTransaction().commit();
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to delete the lecturer", e, 500);
         }
     }
 
@@ -121,11 +158,17 @@ public class LecturerServiceImpl implements LecturerService {
     public LecturerTO getLecturerDetails(Integer lecturerId) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerId);
+            if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
+            LecturerTO lecturerTO = transformer.toLecturerTO(optLecturer.get());
+            if (optLecturer.get().getPicture() != null) {
+                lecturerTO.setPicturePath(AppStore.getBucket().get(optLecturer.get().getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+            }
             AppStore.getEntityManager().getTransaction().commit();
-            return null;
-        }catch (Exception e){
+            return lecturerTO;
+        }catch (Throwable e){
             AppStore.getEntityManager().getTransaction().rollback();
-            throw new RuntimeException(e);
+            throw new AppException("Failed to find the lecturer", e, 500);
         }
     }
 
@@ -133,11 +176,35 @@ public class LecturerServiceImpl implements LecturerService {
     public List<LecturerTO> getAllLecturers(LecturerType lecturerType) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            List<Lecturer> lecturerList;
+            if (lecturerType == LecturerType.FULL_TIME) {
+                lecturerList = lecturerRepository.findFullTimeLecturers();
+            } else if (lecturerType == LecturerType.VISITING) {
+                lecturerList = lecturerRepository.findVisitingLecturers();
+            } else {
+                lecturerList = lecturerRepository.findAll();
+            }
             AppStore.getEntityManager().getTransaction().commit();
-            return List.of();
+            return lecturerList.stream().map(lecturer -> {
+                LecturerTO lecturerTO = transformer.toLecturerTO(lecturer);
+                if (lecturer.getPicture() != null) {
+                    lecturerTO.setPicturePath(AppStore.getBucket().get(lecturer.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+                }
+                return lecturerTO;
+            }).collect(Collectors.toList());
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
             throw new RuntimeException(e);
+        }
+    }
+
+    private void updateLinkedIn(Lecturer currentLecturer, Lecturer newLecturer) {
+        if (currentLecturer.getLinkedin() != null && newLecturer.getLinkedin() == null) {
+            linkedInRepository.deleteById(currentLecturer.getId());
+        } else if (currentLecturer.getLinkedin() == null && newLecturer.getLinkedin() != null) {
+            linkedInRepository.save(newLecturer.getLinkedin());
+        } else if(newLecturer.getLinkedin() != null){
+            linkedInRepository.update(newLecturer.getLinkedin());
         }
     }
 }
