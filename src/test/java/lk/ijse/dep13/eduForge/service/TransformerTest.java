@@ -1,5 +1,6 @@
 package lk.ijse.dep13.eduForge.service;
 
+import jakarta.transaction.Transactional;
 import lk.ijse.dep13.eduforge.WebAppConfig;
 import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
@@ -9,14 +10,18 @@ import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import lk.ijse.dep13.eduforge.util.Transformer;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringJUnitWebConfig(classes = {WebAppConfig.class, WebRootConfig.class})
+@Transactional
 public class TransformerTest {
 
-    private final Transformer transformer = new Transformer();
+    @Autowired
+    private Transformer transformer;
 
     @Test
     void toLecturerTO(){

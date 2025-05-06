@@ -6,15 +6,18 @@ import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class Transformer {
-    private final ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper;
 
-    public Transformer() {
+    public Transformer(ModelMapper mapper) {
+        this.mapper = mapper;
         mapper.typeMap(LinkedIn.class, String.class).setConverter(context -> context.getSource() !=null ? context.getSource().getUrl() : null);
         mapper.typeMap(MultipartFile.class, Picture.class).setConverter(context -> null);
         mapper.typeMap(String.class, LinkedIn.class).setConverter(mappingContext -> mappingContext.getSource() != null ? new LinkedIn(null, mappingContext.getSource()) : null);

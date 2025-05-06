@@ -1,14 +1,9 @@
 package lk.ijse.dep13.eduforge.controller;
 
-import com.google.cloud.storage.Bucket;
-import jakarta.persistence.EntityManager;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
-import lk.ijse.dep13.eduforge.service.ServiceFactory;
 import lk.ijse.dep13.eduforge.service.custom.LecturerService;
-import lk.ijse.dep13.eduforge.store.AppStore;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +14,6 @@ import java.util.List;
 @RequestMapping("/api/v1/lecturers")
 @CrossOrigin
 public class LecturerHttpController {
-
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private Bucket bucket;
 
     private LecturerService lecturerService;
 

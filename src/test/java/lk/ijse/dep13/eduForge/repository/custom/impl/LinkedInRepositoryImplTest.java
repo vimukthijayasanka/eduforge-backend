@@ -2,10 +2,12 @@ package lk.ijse.dep13.eduForge.repository.custom.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import lk.ijse.dep13.eduforge.WebAppConfig;
 import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
-import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
 import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
 import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
@@ -14,37 +16,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitWebConfig(classes = {WebRootConfig.class})
+@SpringJUnitWebConfig(classes = {WebRootConfig.class, WebAppConfig.class})
+@Transactional
 public class LinkedInRepositoryImplTest {
 
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
+    @PersistenceContext
     private EntityManager entityManager;
-    private final LinkedInRepository repository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LINKEDIN);
 
-    private LecturerRepository lecturerRepository;
-    private LinkedInRepository linkedInRepository;
-    private PictureRepository pictureRepository;
-
-    @BeforeEach
-    void setUp() {
-        entityManager = entityManagerFactory.createEntityManager();
-        repository.setEntityManager(entityManager);
-        entityManager.getTransaction().begin();
-
-    }
-
-    @AfterEach
-    void tearDown() {
-        entityManager.getTransaction().commit();
-        entityManager.close();
-    }
+    @Autowired
+    private LinkedInRepository repository;
 
     @Test
     void save() {
