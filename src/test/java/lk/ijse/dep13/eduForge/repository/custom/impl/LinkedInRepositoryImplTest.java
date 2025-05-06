@@ -6,7 +6,9 @@ import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.repository.RepositoryFactory;
+import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
+import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +28,16 @@ public class LinkedInRepositoryImplTest {
     private EntityManager entityManager;
     private final LinkedInRepository repository = RepositoryFactory.getInstance().getRepository(RepositoryFactory.RepositoryTypes.LINKEDIN);
 
+    private LecturerRepository lecturerRepository;
+    private LinkedInRepository linkedInRepository;
+    private PictureRepository pictureRepository;
+
     @BeforeEach
     void setUp() {
         entityManager = entityManagerFactory.createEntityManager();
         repository.setEntityManager(entityManager);
         entityManager.getTransaction().begin();
+
     }
 
     @AfterEach
