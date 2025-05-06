@@ -157,8 +157,14 @@ public class LecturerServiceImpl implements LecturerService {
     public LecturerTO getLecturerDetails(Integer lecturerId) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerId);
+            if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
+            LecturerTO lecturerTO = transformer.toLecturerTO(optLecturer.get());
+            if (optLecturer.get().getPicture() != null) {
+                lecturerTO.setPicturePath(AppStore.getBucket().get(optLecturer.get().getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+            }
             AppStore.getEntityManager().getTransaction().commit();
-            return null;
+            return lecturerTO;
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
             throw new RuntimeException(e);
