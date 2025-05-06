@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class LecturerServiceImpl implements LecturerService {
 
@@ -175,8 +176,22 @@ public class LecturerServiceImpl implements LecturerService {
     public List<LecturerTO> getAllLecturers(LecturerType lecturerType) {
         AppStore.getEntityManager().getTransaction().begin();
         try{
+            List<Lecturer> lecturerList;
+            if (lecturerType == LecturerType.FULL_TIME) {
+                lecturerList = lecturerRepository.findFullTimeLecturers();
+            } else if (lecturerType == LecturerType.VISITING) {
+                lecturerList = lecturerRepository.findVisitingLecturers();
+            } else {
+                lecturerList = lecturerRepository.findAll();
+            }
             AppStore.getEntityManager().getTransaction().commit();
-            return List.of();
+            return lecturerList.stream().map(lecturer -> {
+                LecturerTO lecturerTO = transformer.toLecturerTO(lecturer);
+                if (lecturer.getPicture() != null) {
+                    lecturerTO.setPicturePath(AppStore.getBucket().get(lecturer.getPicture().getPicturePath()).signUrl(1, TimeUnit.DAYS, Storage.SignUrlOption.withV4Signature()).toString());
+                }
+                return lecturerTO;
+            }).collect(Collectors.toList());
         }catch (Exception e){
             AppStore.getEntityManager().getTransaction().rollback();
             throw new RuntimeException(e);
