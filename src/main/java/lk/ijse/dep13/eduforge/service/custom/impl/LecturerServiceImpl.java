@@ -1,4 +1,4 @@
-package lk.ijse.dep13.eduforge.service.impl;
+package lk.ijse.dep13.eduforge.service.custom.impl;
 
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
@@ -10,12 +10,12 @@ import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
 import lk.ijse.dep13.eduforge.exception.AppException;
-import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
-import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
-import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
+import lk.ijse.dep13.eduforge.repository.LecturerRepository;
+import lk.ijse.dep13.eduforge.repository.LinkedInRepository;
+import lk.ijse.dep13.eduforge.repository.PictureRepository;
 import lk.ijse.dep13.eduforge.service.custom.LecturerService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import lk.ijse.dep13.eduforge.util.Transformer;
+import lk.ijse.dep13.eduforge.service.util.Transformer;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -95,13 +95,13 @@ public class LecturerServiceImpl implements LecturerService {
                 pictureRepository.deleteById(currentLecturer.getId());
                 bucket.get(currentLecturer.getPicture().getPicturePath()).delete();
             } else if (newLecturer.getPicture() != null) {
-                pictureRepository.update(newLecturer.getPicture());
+                pictureRepository.save(newLecturer.getPicture());
                 bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
             }
         }catch (IOException e){
             throw new AppException("Failed to update the lecturer details", e, 500);
         }
-        lecturerRepository.update(newLecturer);
+        lecturerRepository.save(newLecturer);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class LecturerServiceImpl implements LecturerService {
         Lecturer newLecturer = transformer.fromLecturerTO(lecturerTO);
         newLecturer.setPicture(currentLecturer.getPicture());
         updateLinkedIn(currentLecturer, newLecturer);
-        lecturerRepository.update(newLecturer);
+        lecturerRepository.save(newLecturer);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class LecturerServiceImpl implements LecturerService {
         } else if (currentLecturer.getLinkedin() == null && newLecturer.getLinkedin() != null) {
             linkedInRepository.save(newLecturer.getLinkedin());
         } else if(newLecturer.getLinkedin() != null){
-            linkedInRepository.update(newLecturer.getLinkedin());
+            linkedInRepository.save(newLecturer.getLinkedin());
         }
     }
 }

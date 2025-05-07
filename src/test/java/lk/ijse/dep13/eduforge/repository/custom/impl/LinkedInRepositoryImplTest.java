@@ -1,29 +1,21 @@
-package lk.ijse.dep13.eduForge.repository.custom.impl;
+package lk.ijse.dep13.eduforge.repository.custom.impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lk.ijse.dep13.eduforge.WebAppConfig;
-import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
-import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
-import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
-import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
+import lk.ijse.dep13.eduforge.repository.LinkedInRepository;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitWebConfig(classes = {WebRootConfig.class, WebAppConfig.class})
+@SpringBootTest
 @Transactional
 public class LinkedInRepositoryImplTest {
 
@@ -57,7 +49,7 @@ public class LinkedInRepositoryImplTest {
         LinkedIn linkedIn = new LinkedIn(lecturer, "http://linkedin.com/kasun-sampath");
         repository.save(linkedIn);
         linkedIn.setUrl("https://linkedin.com/kasun-sampath");
-        repository.update(linkedIn);
+        repository.save(linkedIn);
 
         LinkedIn dbLinkedIn = entityManager.find(LinkedIn.class, lecturer.getId());
         assertEquals(linkedIn, dbLinkedIn);

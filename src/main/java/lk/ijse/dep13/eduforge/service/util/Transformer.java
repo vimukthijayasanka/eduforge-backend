@@ -1,4 +1,4 @@
-package lk.ijse.dep13.eduforge.util;
+package lk.ijse.dep13.eduforge.service.util;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;

@@ -2,9 +2,6 @@ package lk.ijse.dep13.eduforge.service.custom;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
-import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
-import lk.ijse.dep13.eduforge.repository.custom.LinkedInRepository;
-import lk.ijse.dep13.eduforge.repository.custom.PictureRepository;
 import lk.ijse.dep13.eduforge.service.SuperService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 

@@ -1,28 +1,22 @@
-package lk.ijse.dep13.eduForge.repository.custom.impl;
+package lk.ijse.dep13.eduforge.repository.custom.impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lk.ijse.dep13.eduforge.WebAppConfig;
-import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
-import lk.ijse.dep13.eduforge.repository.custom.LecturerRepository;
+import lk.ijse.dep13.eduforge.repository.LecturerRepository;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {WebRootConfig.class})
-@SpringJUnitWebConfig(classes = {WebRootConfig.class, WebAppConfig.class})
+@SpringBootTest
 @Transactional
 public class LecturerRepositoryImplTest {
 
@@ -49,7 +43,7 @@ public class LecturerRepositoryImplTest {
         savedLecturer.setDesignation("Assistant Professor");
         savedLecturer.setQualification("Bsc (Hons) in SE");
         savedLecturer.setType(LecturerType.VISITING);
-        repository.update(savedLecturer);
+        repository.save(savedLecturer);
 
         Lecturer actualLecturer = entityManager.find(Lecturer.class, savedLecturer.getId());
         assertEquals(savedLecturer, actualLecturer);

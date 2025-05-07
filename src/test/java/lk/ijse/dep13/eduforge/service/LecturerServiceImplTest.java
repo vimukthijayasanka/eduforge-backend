@@ -1,11 +1,6 @@
-package lk.ijse.dep13.eduForge.service;
+package lk.ijse.dep13.eduforge.service;
 
-import com.google.cloud.storage.Bucket;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
-import lk.ijse.dep13.eduforge.WebAppConfig;
-import lk.ijse.dep13.eduforge.WebRootConfig;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.exception.AppException;
@@ -15,12 +10,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
-@SpringJUnitWebConfig(classes = {WebAppConfig.class, WebRootConfig.class})
+@SpringBootTest
 @Transactional
 //@ExtendWith(MockitoExtension.class)
 public class LecturerServiceImplTest {
