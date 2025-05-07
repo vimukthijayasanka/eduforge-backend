@@ -13,7 +13,7 @@ import lk.ijse.dep13.eduforge.exception.AppException;
 import lk.ijse.dep13.eduforge.repository.LecturerRepository;
 import lk.ijse.dep13.eduforge.repository.LinkedInRepository;
 import lk.ijse.dep13.eduforge.repository.PictureRepository;
-import lk.ijse.dep13.eduforge.service.custom.LecturerService;
+import lk.ijse.dep13.eduforge.service.LecturerService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import lk.ijse.dep13.eduforge.service.util.Transformer;
 import org.springframework.stereotype.Service;
@@ -73,47 +73,57 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void updateLecturerDetails(LecturerReqTO lecturerReqTO) {
-        Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerReqTO.getId());
-        if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
-        Lecturer currentLecturer = optLecturer.get();
+        Lecturer currentLecturer = lecturerRepository.findById(lecturerReqTO.getId()).orElseThrow(() -> new AppException("Lecturer not found", 404));
+
+        Blob blobId = null;
+        if (currentLecturer.getPicture() != null) {
+            blobId = bucket.get(currentLecturer.getPicture().getPicturePath());
+            pictureRepository.delete(currentLecturer.getPicture());
+        }
+
+        if (currentLecturer.getLinkedin() != null) {
+            linkedInRepository.delete(currentLecturer.getLinkedin());
+        }
 
         Lecturer newLecturer = transformer.fromLecturerReqTO(lecturerReqTO);
+        newLecturer.setLinkedin(null);
+        newLecturer = lecturerRepository.save(newLecturer);
+
         if (lecturerReqTO.getPicture() != null) {
-            newLecturer.setPicture(new Picture(newLecturer, "lecturers/" + currentLecturer.getId()));
+            Picture picture = new Picture(newLecturer, "lecturers/" + newLecturer.getId());
+            newLecturer.setPicture(pictureRepository.save(picture));
         }
         if (lecturerReqTO.getLinkedin() != null) {
-            newLecturer.setLinkedin(new LinkedIn(newLecturer, lecturerReqTO.getLinkedin()));
+            LinkedIn linkedIn = new LinkedIn(newLecturer, lecturerReqTO.getLinkedin());
+            newLecturer.setLinkedin(linkedInRepository.save(linkedIn));
         }
 
-        updateLinkedIn(currentLecturer, newLecturer);
-
         try{
-            if (newLecturer.getPicture() != null && currentLecturer.getPicture() == null) {
-                pictureRepository.save(newLecturer.getPicture());
+            if (lecturerReqTO.getPicture() != null) {
                 bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
-            } else if (newLecturer.getPicture() == null && currentLecturer.getPicture() != null) {
-                pictureRepository.deleteById(currentLecturer.getId());
-                bucket.get(currentLecturer.getPicture().getPicturePath()).delete();
-            } else if (newLecturer.getPicture() != null) {
-                pictureRepository.save(newLecturer.getPicture());
-                bucket.create(newLecturer.getPicture().getPicturePath(), lecturerReqTO.getPicture().getInputStream(), lecturerReqTO.getPicture().getContentType());
+            } else if (blobId != null){
+                blobId.delete();
             }
         }catch (IOException e){
             throw new AppException("Failed to update the lecturer details", e, 500);
         }
-        lecturerRepository.save(newLecturer);
     }
 
     @Override
     public void updateLecturerDetails(LecturerTO lecturerTO) {
-        Optional<Lecturer> optLecturer = lecturerRepository.findById(lecturerTO.getId());
-        if (optLecturer.isEmpty()) throw new AppException("Lecturer not found", 404);
-        Lecturer currentLecturer = optLecturer.get();
+        Lecturer currentLecturer = lecturerRepository.findById(lecturerTO.getId()).orElseThrow(() -> new AppException("Lecturer not found", 404));
 
+        if (currentLecturer.getLinkedin() != null) {
+            linkedInRepository.delete(currentLecturer.getLinkedin());
+        }
         Lecturer newLecturer = transformer.fromLecturerTO(lecturerTO);
-        newLecturer.setPicture(currentLecturer.getPicture());
-        updateLinkedIn(currentLecturer, newLecturer);
-        lecturerRepository.save(newLecturer);
+        newLecturer.setLinkedin(null);
+
+        newLecturer = lecturerRepository.save(newLecturer);
+        if (lecturerTO.getLinkedin() != null) {
+            LinkedIn linkedIn = new LinkedIn(newLecturer, lecturerTO.getLinkedin());
+            newLecturer.setLinkedin(linkedInRepository.save(linkedIn));
+        }
     }
 
     @Override

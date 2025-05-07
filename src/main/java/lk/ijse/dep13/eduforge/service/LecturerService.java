@@ -1,8 +1,7 @@
-package lk.ijse.dep13.eduforge.service.custom;
+package lk.ijse.dep13.eduforge.service;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.LecturerTO;
-import lk.ijse.dep13.eduforge.service.SuperService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 
 import java.util.List;

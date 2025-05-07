@@ -1,8 +1,7 @@
-package lk.ijse.dep13.eduforge.repository.impl;
+package lk.ijse.dep13.eduforge.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lk.ijse.dep13.eduforge.repository.QueryRepository;
 import org.springframework.stereotype.Component;
 
 @Component

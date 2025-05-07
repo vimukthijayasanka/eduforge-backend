@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @SpringBootApplication
-public class AppInitializer implements WebMvcConfigurer {
+public class AppInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(AppInitializer.class, args);
@@ -37,7 +37,7 @@ public class AppInitializer implements WebMvcConfigurer {
                 .setStorageBucket(storageBucket)
                 .build();
 
-        FirebaseApp.initializeApp(options);
+        if(FirebaseApp.getApps().isEmpty()) FirebaseApp.initializeApp(options);
         return StorageClient.getInstance().bucket();
     };
 }
