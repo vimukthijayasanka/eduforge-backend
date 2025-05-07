@@ -5,15 +5,12 @@ import com.google.cloud.storage.Bucket;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
-import lk.ijse.dep13.eduforge.converter.LecturerTypeConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
@@ -43,9 +40,4 @@ public class AppInitializer implements WebMvcConfigurer {
         FirebaseApp.initializeApp(options);
         return StorageClient.getInstance().bucket();
     };
-
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new LecturerTypeConverter());
-    }
 }
