@@ -2,7 +2,7 @@ package lk.ijse.dep13.eduforge.service;
 
 import jakarta.transaction.Transactional;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
-import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
+import lk.ijse.dep13.eduforge.dto.LecturerTO;
 import lk.ijse.dep13.eduforge.exception.AppException;
 import lk.ijse.dep13.eduforge.service.custom.LecturerService;
 import lk.ijse.dep13.eduforge.util.LecturerType;

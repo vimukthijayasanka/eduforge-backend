@@ -1,7 +1,7 @@
 package lk.ijse.dep13.eduforge.controller;
 
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
-import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
+import lk.ijse.dep13.eduforge.dto.LecturerTO;
 import lk.ijse.dep13.eduforge.service.custom.LecturerService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
 import org.springframework.beans.factory.annotation.Autowired;

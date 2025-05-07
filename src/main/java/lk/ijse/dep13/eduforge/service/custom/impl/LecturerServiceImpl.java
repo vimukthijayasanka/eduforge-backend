@@ -5,7 +5,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import jakarta.transaction.Transactional;
 import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
-import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
+import lk.ijse.dep13.eduforge.dto.LecturerTO;
 import lk.ijse.dep13.eduforge.entity.Lecturer;
 import lk.ijse.dep13.eduforge.entity.LinkedIn;
 import lk.ijse.dep13.eduforge.entity.Picture;
@@ -136,10 +136,8 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public List<LecturerTO> getAllLecturers(LecturerType lecturerType) {
         List<Lecturer> lecturerList;
-        if (lecturerType == LecturerType.FULL_TIME) {
-            lecturerList = lecturerRepository.findFullTimeLecturers();
-        } else if (lecturerType == LecturerType.VISITING) {
-            lecturerList = lecturerRepository.findVisitingLecturers();
+        if (lecturerType != null) {
+            lecturerList = lecturerRepository.findLecturersByType(lecturerType);
         } else {
             lecturerList = lecturerRepository.findAll();
         }

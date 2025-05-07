@@ -1,4 +1,4 @@
-package lk.ijse.dep13.eduforge.dto.response;
+package lk.ijse.dep13.eduforge.dto;
 
 import jakarta.validation.constraints.*;
 import lk.ijse.dep13.eduforge.util.LecturerType;
