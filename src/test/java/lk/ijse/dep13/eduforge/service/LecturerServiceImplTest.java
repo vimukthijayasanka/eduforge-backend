@@ -5,8 +5,6 @@ import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.LecturerTO;
 import lk.ijse.dep13.eduforge.exception.AppException;
 import lk.ijse.dep13.eduforge.util.LecturerType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,40 +14,10 @@ import static org.junit.jupiter.api.Assumptions.*;
 
 @SpringBootTest
 @Transactional
-//@ExtendWith(MockitoExtension.class)
 public class LecturerServiceImplTest {
 
     @Autowired
     private LecturerService lecturerService;
-
-//    @Mock
-//    private LecturerRepository lecturerRepository;
-//
-//    @Mock
-//    private LinkedInRepository linkedInRepository;
-//
-//    @Mock
-//    private PictureRepository pictureRepository;
-
-    @BeforeEach
-    void setUp(){
-//        when(lecturerRepository.save(any(Lecturer.class))).thenAnswer(inv ->{
-//            Lecturer lecturer = inv.getArgument(0);
-//            lecturer.setId(1);
-//            return lecturer;
-//        });
-//
-//        when(linkedInRepository.save(any(LinkedIn.class))).thenAnswer(inv -> inv.getArgument(0));
-//
-//        lecturerService.setLecturerRepository(lecturerRepository);
-//        lecturerService.setLinkedInRepository(linkedInRepository);
-//        lecturerService.setPictureRepository(pictureRepository);
-    }
-
-    @AfterEach
-    void tearDown(){
-//        entityManager.close();
-    }
 
     @Test
     void saveLecturer(){

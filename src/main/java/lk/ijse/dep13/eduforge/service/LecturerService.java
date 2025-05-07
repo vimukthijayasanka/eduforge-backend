@@ -7,10 +7,6 @@ import lk.ijse.dep13.eduforge.util.LecturerType;
 import java.util.List;
 
 public interface LecturerService extends SuperService {
-//
-//    void setLecturerRepository(LecturerRepository lecturerRepository);
-//    void setLinkedInRepository(LinkedInRepository linkedInRepository);
-//    void setPictureRepository(PictureRepository pictureRepository);
 
     LecturerTO saveLecturer(LecturerReqTO lecturerReqTO);
 
