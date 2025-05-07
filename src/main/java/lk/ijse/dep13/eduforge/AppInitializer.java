@@ -7,12 +7,13 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 import lk.ijse.dep13.eduforge.converter.LecturerTypeConverter;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
@@ -31,12 +32,12 @@ public class AppInitializer implements WebMvcConfigurer {
     }
 
     @Bean
-    public Bucket defaultBucket() throws IOException {
+    public Bucket defaultBucket(@Value("${application.firebase.storage.bucket}") String storageBucket) throws IOException {
         InputStream serviceAccount = new ClassPathResource("/eduforge-1997-firebase-adminsdk-fbsvc-f6c0cea422.json").getInputStream();
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setStorageBucket("eduforge-1997.firebasestorage.app")
+                .setStorageBucket(storageBucket)
                 .build();
 
         FirebaseApp.initializeApp(options);

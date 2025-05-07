@@ -4,6 +4,7 @@ import lk.ijse.dep13.eduforge.dto.request.LecturerReqTO;
 import lk.ijse.dep13.eduforge.dto.response.LecturerTO;
 import lk.ijse.dep13.eduforge.service.custom.LecturerService;
 import lk.ijse.dep13.eduforge.util.LecturerType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @CrossOrigin
 public class LecturerHttpController {
 
+    @Autowired
     private LecturerService lecturerService;
 
     @ResponseStatus(HttpStatus.CREATED)
